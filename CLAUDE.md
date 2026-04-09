@@ -8,7 +8,8 @@ Each subdirectory is a self-contained demo project that maps to one article.
 ```
 keycloak-demos/
 ├── custom-spi-permission-mapper/   # Java SPI — template-based permission claims
-└── <next-demo>/
+├── <next-demo>/
+└── .github/workflows/ # github ci workflows per demo-project
 ```
 
 ## Adding a New Demo
@@ -17,7 +18,8 @@ keycloak-demos/
 2. Include a standalone `README.md` with: problem statement, how it works, quick start, and article link
 3. Include a `docker-compose.yml` so readers can run it with a single command
 4. Include a `realm-export.json` if Keycloak configuration is part of the demo
-5. Update the demo table in the root `README.md`
+5. Include a github ci workflow for the demo
+6. Update the demo table in the root `README.md`
 
 ## Per-Demo Tech Stacks
 
