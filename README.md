@@ -6,9 +6,9 @@ Each directory is a self-contained, runnable demo. Clone the repo, navigate into
 
 ## Demos
 
-| Demo | Description | Article |
-|------|-------------|---------|
-| [custom-spi-permission-mapper](./custom-spi-permission-mapper) | Keycloak custom protocol mapper that composes permission claims from group attributes using a configurable template | — |
+| Demo                                                           | Description                                                                                                         | Article                                                                                                                                 |
+|----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| [custom-spi-permission-mapper](./custom-spi-permission-mapper) | Keycloak custom protocol mapper that composes permission claims from group attributes using a configurable template | [Dynamic Claims in Keycloak](https://medium.com/@vgzxkgmrpn/dynamic-claims-in-keycloak-stop-hard-coding-token-permissions-8832ad63bc9c) |
 
 ## Quick Start
 
