@@ -1,0 +1,42 @@
+# Build outputs
+build/
+out/
+dist/
+target/
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Maven
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.classpath
+*.project
+*.factorypath
+.springBeans
+.sts4-cache
+.apt_generated
+.settings/
+.nb-gradle/
+nbproject/private/
+nbbuild/
+nbdist/
+
+# Kotlin/JVM artifacts
+.kotlin/
+*.class
+
+# Claude Code
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db

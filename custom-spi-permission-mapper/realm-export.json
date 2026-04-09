@@ -1,0 +1,87 @@
+{
+  "realm": "demo",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "groups": [
+    {
+      "name": "customer-a",
+      "attributes": {
+        "customer_id": ["abc123"]
+      }
+    },
+    {
+      "name": "customer-b",
+      "attributes": {
+        "customer_id": ["def456"]
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "service-account-mqtt-client",
+      "enabled": true,
+      "serviceAccountClientId": "mqtt-client",
+      "groups": [
+        "/customer-a"
+      ]
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "custom-group-mapper",
+      "description": "Custom group-attribute to claim mapper",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "mqtt-permissions",
+          "protocol": "openid-connect",
+          "protocolMapper": "template-permission-mapper",
+          "consentRequired": false,
+          "config": {
+            "permission.template": "mqtt/customers/${customer_id}/telemetry/#",
+            "group.attribute.name": "customer_id",
+            "claim.name": "permissions",
+            "access.token.claim": "true",
+            "id.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "mqtt-client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "secret": "mqtt-client-secret",
+      "redirectUris": ["*"],
+      "defaultClientScopes": [
+        "web-origins",
+        "service_account",
+        "acr",
+        "custom-group-mapper",
+        "profile",
+        "roles",
+        "basic",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "organization",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    }
+  ]
+}

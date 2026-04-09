@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'com.gradleup.shadow' version '8.3.6'
+}
+
+group = 'de.schneefisch'
+version = '1.0-SNAPSHOT'
+
+def keycloakVersion = '26.5.7'
+
+// Keycloak runs on Quarkus and a JVM 21 version (as of spring 2026)
+// Therefore we need to compile to Java 21
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Keycloak SPI dependencies — provided at runtime by the Keycloak server
+    compileOnly "org.keycloak:keycloak-core:${keycloakVersion}"
+    compileOnly "org.keycloak:keycloak-server-spi:${keycloakVersion}"
+    compileOnly "org.keycloak:keycloak-server-spi-private:${keycloakVersion}"
+    compileOnly "org.keycloak:keycloak-services:${keycloakVersion}"
+
+    // Test dependencies
+    testImplementation "org.keycloak:keycloak-core:${keycloakVersion}"
+    testImplementation "org.keycloak:keycloak-server-spi:${keycloakVersion}"
+    testImplementation "org.keycloak:keycloak-server-spi-private:${keycloakVersion}"
+    testImplementation "org.keycloak:keycloak-services:${keycloakVersion}"
+
+    testImplementation platform('org.junit:junit-bom:5.12.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    testImplementation 'org.mockito:mockito-core:5.18.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+shadowJar {
+    archiveClassifier.set('')
+}
