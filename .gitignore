@@ -6,11 +6,10 @@ target/
 
 # Gradle
 .gradle/
-!gradle/wrapper/gradle-wrapper.jar
 
-# Maven
+# Maven / JVM artifacts — keep Gradle wrapper JAR committed
 *.jar
-!gradle/wrapper/gradle-wrapper.jar
+!**/gradle/wrapper/gradle-wrapper.jar
 
 # IDE
 .idea/
