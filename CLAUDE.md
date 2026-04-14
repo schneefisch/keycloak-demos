@@ -8,6 +8,7 @@ Each subdirectory is a self-contained demo project that maps to one article.
 ```
 keycloak-demos/
 ├── custom-spi-permission-mapper/   # Java SPI — template-based permission claims
+├── client-access-restriction/      # Authorization Services — block app login by role
 ├── <next-demo>/
 └── .github/workflows/ # github ci workflows per demo-project
 ```

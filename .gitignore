@@ -9,6 +9,7 @@ target/
 
 # Maven / JVM artifacts — keep Gradle wrapper JAR committed
 *.jar
+!client-access-restriction/*.jar
 !**/gradle/wrapper/gradle-wrapper.jar
 
 # IDE

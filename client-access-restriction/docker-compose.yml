@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.6
+    command: start-dev --import-realm
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+      KC_HOSTNAME: localhost
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+      # restrict-client-auth SPI — evaluates Authorization Services policies during login
+      # https://github.com/sventorben/keycloak-restrict-client-auth
+      - ./keycloak-restrict-client-auth.jar:/opt/keycloak/providers/keycloak-restrict-client-auth.jar:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "echo > /dev/tcp/localhost/8080"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 20s
+
+  grafana:
+    image: grafana/grafana-oss:11.6.0
+    environment:
+      # OAuth configuration — points to the Keycloak realm
+      GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+      GF_AUTH_GENERIC_OAUTH_NAME: "Keycloak"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: "grafana"
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: "grafana-secret"
+      GF_AUTH_GENERIC_OAUTH_SCOPES: "openid profile email"
+      # auth_url is accessed by the browser (via host network)
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: "http://localhost:8080/realms/app-access-demo/protocol/openid-connect/auth"
+      # token_url and api_url are called server-side (via Docker network)
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: "http://keycloak:8080/realms/app-access-demo/protocol/openid-connect/token"
+      GF_AUTH_GENERIC_OAUTH_API_URL: "http://keycloak:8080/realms/app-access-demo/protocol/openid-connect/userinfo"
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
+      # Map Keycloak realm roles (in the "groups" JWT claim) to Grafana org roles
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'grafana-admin') && 'Admin' || contains(groups[*], 'grafana-editor') && 'Editor' || 'Viewer'"
+      GF_SERVER_ROOT_URL: "http://localhost:3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+
+volumes:
+  pgdata:

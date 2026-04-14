@@ -10,6 +10,7 @@ Each directory is a self-contained, runnable demo. Clone the repo, navigate into
 |----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | [custom-spi-permission-mapper](./custom-spi-permission-mapper) | Keycloak custom protocol mapper that composes permission claims from group attributes using a configurable template | [Dynamic Claims in Keycloak](https://medium.com/@vgzxkgmrpn/dynamic-claims-in-keycloak-stop-hard-coding-token-permissions-8832ad63bc9c) |
 | [step-up-authentication](./step-up-authentication) | ACR-based step-up authentication — require MFA for sensitive endpoints while accepting password-only auth for low-risk operations | |
+| [client-access-restriction](./client-access-restriction) | Block users from logging into a third-party app (Grafana) unless they have a specific Keycloak role — using Authorization Services | |
 
 ## Quick Start
 

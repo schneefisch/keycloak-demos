@@ -1,0 +1,99 @@
+name: client-access-restriction
+
+on:
+  push:
+    paths:
+      - 'client-access-restriction/**'
+      - '.github/workflows/client-access-restriction.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'client-access-restriction/**'
+      - '.github/workflows/client-access-restriction.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client-access-restriction
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Validate realm-export.json
+        run: python3 -c "import json; json.load(open('realm-export.json'))"
+
+      - name: Download SPI JAR
+        run: bash scripts/download-spi.sh
+
+      - name: Validate docker-compose.yml
+        run: docker compose config --quiet
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: validate
+    defaults:
+      run:
+        working-directory: client-access-restriction
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Download SPI JAR
+        run: bash scripts/download-spi.sh
+
+      - name: Start stack
+        run: docker compose up -d
+
+      - name: Wait for Keycloak
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf "http://localhost:8080/realms/app-access-demo/.well-known/openid-configuration" > /dev/null 2>&1; then
+              echo "Keycloak is ready"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Keycloak did not become ready"
+          docker compose logs keycloak
+          exit 1
+
+      - name: Test alice can get a token
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            "http://localhost:8080/realms/app-access-demo/protocol/openid-connect/token" \
+            -d "client_id=grafana" \
+            -d "client_secret=grafana-secret" \
+            -d "username=alice" \
+            -d "password=password" \
+            -d "grant_type=password")
+          echo "alice: HTTP $RESPONSE"
+          [ "$RESPONSE" = "200" ]
+
+      - name: Test bob is blocked
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            "http://localhost:8080/realms/app-access-demo/protocol/openid-connect/token" \
+            -d "client_id=grafana" \
+            -d "client_secret=grafana-secret" \
+            -d "username=bob" \
+            -d "password=password" \
+            -d "grant_type=password")
+          echo "bob: HTTP $RESPONSE"
+          [ "$RESPONSE" = "401" ]
+
+      - name: Verify Grafana is reachable
+        run: |
+          for i in $(seq 1 12); do
+            if curl -sf http://localhost:3000/api/health > /dev/null 2>&1; then
+              echo "Grafana is ready"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Grafana did not become ready"
+          docker compose logs grafana
+          exit 1
+
+      - name: Cleanup
+        if: always()
+        run: docker compose down -v
