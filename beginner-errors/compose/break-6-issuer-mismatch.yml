@@ -1,0 +1,13 @@
+# Error 6: no fixed hostname, so Keycloak derives the issuer from each request:
+#   browser -> localhost:8080  => iss = http://localhost:8080/realms/demo
+#   API     -> keycloak:8080   => API expects http://keycloak:8080/realms/demo
+services:
+  keycloak:
+    # !override replaces the whole environment: KC_HOSTNAME and KC_HOSTNAME_BACKCHANNEL_DYNAMIC are gone
+    environment: !override
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+  api:
+    environment:
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/demo

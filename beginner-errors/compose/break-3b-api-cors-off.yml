@@ -1,0 +1,5 @@
+# Error 3, variant b: the API sends no CORS headers, so the browser blocks the SPA's API call
+services:
+  api:
+    environment:
+      DEMO_CORS_ENABLED: "false"

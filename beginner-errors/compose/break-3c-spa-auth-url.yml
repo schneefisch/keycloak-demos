@@ -1,0 +1,5 @@
+# Error 3, variant c: the SPA uses the pre-Keycloak-17 base URL with /auth from an outdated tutorial
+services:
+  spa:
+    environment:
+      VITE_KEYCLOAK_URL: http://localhost:8080/auth

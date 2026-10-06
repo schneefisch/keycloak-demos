@@ -1,0 +1,21 @@
+server:
+  port: 8081
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Must match the `iss` claim exactly: the browser gets its tokens from localhost:8080 (Error 6)
+          issuer-uri: http://localhost:8080/realms/demo
+          # Keys are fetched over the Docker network. With both values set, Spring checks `iss`
+          # but does not call the issuer's discovery endpoint.
+          jwk-set-uri: http://keycloak:8080/realms/demo/protocol/openid-connect/certs
+          # Tokens must be meant for this API (added by the `demo-api-audience` client scope, Error 5)
+          audiences: demo-api
+
+demo:
+  cors:
+    # Error 3, variant b: scripts/break.sh 3b sets DEMO_CORS_ENABLED=false
+    enabled: true
+    allowed-origins: http://localhost:5173
