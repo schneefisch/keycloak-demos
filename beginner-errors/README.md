@@ -117,8 +117,7 @@ The same events are listed in the admin console under *Events* (realm `demo`).
 Spring Boot 4 renamed the resource server starter to `spring-boot-starter-security-oauth2-resource-server` (the old
 `spring-boot-starter-oauth2-resource-server` still exists but is deprecated).
 
-Results of running every break/fix cycle: [VERIFICATION.md](VERIFICATION.md). Screenshot instructions for the article:
-[SCREENSHOTS.md](SCREENSHOTS.md).
+Results of running every break/fix cycle: [VERIFICATION.md](VERIFICATION.md).
 
 ## Cleanup
 
