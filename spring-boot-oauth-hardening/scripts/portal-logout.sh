@@ -10,7 +10,7 @@ echo "events-portal mode: $MODE"
 echo
 echo "=== 1. alice clicks \"Log out\" in the portal ==="
 portal_login alice
-csrf=$(sed -nE 's/.*name="_csrf" value="([^"]*)".*/\1/p' <<< "$PAGE" | head -1)
+csrf=$(csrf_token)
 location=$(curl -s -o /dev/null -c "$JAR" -b "$JAR" -w '%{redirect_url}' -d "${csrf:+_csrf=$csrf}" "$PORTAL/logout")
 echo "  portal redirects to: $(sed -E 's/id_token_hint=([^&]{12})[^&]*/id_token_hint=\1…/' <<< "$location")"
 # The browser follows the redirect: for RP-initiated logout that's Keycloak's end_session_endpoint
@@ -37,8 +37,12 @@ admin=$(curl -s "http://localhost:8080/realms/master/protocol/openid-connect/tok
 alice=$(curl -s -H "Authorization: Bearer $admin" \
   "http://localhost:8080/admin/realms/demo/users?username=alice&exact=true" | jq -r '.[0].id')
 curl -s -o /dev/null -X POST -H "Authorization: Bearer $admin" "http://localhost:8080/admin/realms/demo/users/$alice/logout"
-sleep 2
-after=$(portal_user "$(curl -s -b "$JAR" "$PORTAL/")")
+# Waits up to 5 s for Keycloak's back-channel call to reach the portal, instead of a fixed sleep
+for _ in 1 2 3 4 5; do
+  after=$(portal_user "$(curl -s -b "$JAR" "$PORTAL/")")
+  [ "$after" = "not signed in" ] && break
+  sleep 1
+done
 echo "  portal after:  $after"
 if [ "$after" = "not signed in" ]; then result=ended; else result=still-signed-in; fi
 expect "$MODE" still-signed-in ended "$result"

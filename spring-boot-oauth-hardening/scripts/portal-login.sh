@@ -25,7 +25,7 @@ expect "$EVENTS_PORTAL_MODE" 302 403 "$forged"
 
 echo
 echo "=== $user clicks \"Delete event 1\" (the portal calls DELETE on events-api with $user's token) ==="
-csrf=$(sed -nE 's/.*name="_csrf" value="([^"]*)".*/\1/p' <<< "$PAGE" | head -1)
+csrf=$(csrf_token)
 echo "  CSRF token in the form: ${csrf:-(none: CSRF protection is off)}"
 # -d makes it a POST; curl follows the redirect after it with a GET, like a browser
 page=$(curl -s -L -c "$JAR" -b "$JAR" -d "${csrf:+_csrf=$csrf}" "$PORTAL/events/1/delete")
