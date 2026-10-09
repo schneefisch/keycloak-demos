@@ -12,7 +12,7 @@ Each directory is a self-contained, runnable demo. Clone the repo, navigate into
 | [step-up-authentication](./step-up-authentication) | ACR-based step-up authentication — require MFA for sensitive endpoints while accepting password-only auth for low-risk operations | |
 | [spring-boot-oauth-hardening](./spring-boot-oauth-hardening) | Spring Boot 4.1 resource server, client-credentials backend and BFF in "naive" and "hardened" mode against Keycloak 26.8: `aud`, token type, role mapping, PKCE, logout | |
 | [client-access-restriction](./client-access-restriction) | Block users from logging into a third-party app (Grafana) unless they have a specific Keycloak role — using Authorization Services | |
-| [beginner-errors](./beginner-errors) | Reproduce and fix six common Keycloak errors (HTTPS required, redirect_uri, CORS, invalid_grant, 401, issuer mismatch) with a React SPA and a Spring Boot API | |
+| [beginner-errors](./beginner-errors) | Reproduce and fix six common Keycloak errors (HTTPS required, redirect_uri, CORS, invalid_grant, 401, issuer mismatch) with a React SPA and a Spring Boot API | [Five Keycloak Errors Every Beginner Hits](https://medium.com/@vgzxkgmrpn/five-keycloak-errors-every-beginner-hits-and-what-they-actually-mean-9efc1cbda3b3?sharedUserId=vgzxkgmrpn) |
 
 ## Quick Start
 

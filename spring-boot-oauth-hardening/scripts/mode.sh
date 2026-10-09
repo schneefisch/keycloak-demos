@@ -33,5 +33,5 @@ EVENTS_PORTAL_MODE=$EVENTS_PORTAL_MODE
 EOF
 
 echo "events-api: $EVENTS_API_MODE, notification-service: $NOTIFICATION_SERVICE_MODE, events-portal: $EVENTS_PORTAL_MODE"
-echo "  docker compose up -d --wait ${apps[*]} (takes a few seconds)"
+echo "  docker compose up -d --wait ${apps[*]}"
 compose --progress quiet up -d --wait "${apps[@]}"

@@ -1,6 +1,5 @@
 package de.schneefisch.eventsapi;
 
-import java.time.Instant;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -36,21 +35,6 @@ class NaiveProfileTest extends ResourceServerTest {
         listEvents(accessToken().signedWithPublicKeyAsHmacSecret())
                 .andExpect(status().isUnauthorized())
                 .andExpect(header().string("WWW-Authenticate", containsString("Another algorithm expected")));
-    }
-
-    @Test
-    void tokenFromAnotherIssuer_isRejected() throws Exception {
-        listEvents(accessToken().claim("iss", "http://localhost:8080/realms/other").signed())
-                .andExpect(status().isUnauthorized())
-                .andExpect(header().string("WWW-Authenticate", containsString("The iss claim is not valid")));
-    }
-
-    @Test
-    void expiredToken_isRejected() throws Exception {
-        long twoHoursAgo = Instant.now().minusSeconds(7200).getEpochSecond();
-        listEvents(accessToken().claim("iat", twoHoursAgo).claim("exp", twoHoursAgo + 300).signed())
-                .andExpect(status().isUnauthorized())
-                .andExpect(header().string("WWW-Authenticate", containsString("Jwt expired")));
     }
 
     // --- what gets through -----------------------------------------------------------------

@@ -5,7 +5,8 @@ spring:
         jwt:
           # Rejects tokens that were issued for another service (RFC 9068 §4, RFC 9700 §2.3).
           # Keycloak adds this audience through the audience mapper of the events:read and
-          # events:write client scopes.
+          # events:write client scopes, and through the "roles" scope when the token carries
+          # events-api roles (Audience Resolve mapper).
           audiences: events-api
 
 # Token type, mandatory `exp` and role mapping: see HardenedJwtConfig.

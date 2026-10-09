@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Logs a user in to events-portal the way a browser does, then lets the portal delete event 1.
+# Logs a user in to events-portal the way a browser does, sends a forged cross-site POST (CSRF),
+# then lets the portal delete event 1.
 #   scripts/portal-login.sh [alice|bob]
 # Shows the principal name the portal uses and how events-api answered the portal's calls.
 source "$(dirname "$0")/lib.sh"
@@ -15,6 +16,12 @@ name=$(portal_user)
 [[ -n "$name" && "$name" != "not signed in" ]] || { echo "  ✘ Login failed"; exit 1; }
 echo "  Signed in as: $name"
 echo "  Events from events-api: $(sed -nE 's/.*<pre>(\{status=[0-9]+).*/\1}/p' <<< "$PAGE")"
+
+echo
+echo "=== A malicious page makes $user's browser POST \"Delete event 1\", without a CSRF token ==="
+forged=$(curl -s -o /dev/null -w '%{http_code}' -b "$JAR" -X POST "$PORTAL/events/1/delete")
+echo "  302: the portal ran the delete. 403: CSRF protection blocked it."
+expect "$EVENTS_PORTAL_MODE" 302 403 "$forged"
 
 echo
 echo "=== $user clicks \"Delete event 1\" (the portal calls DELETE on events-api with $user's token) ==="

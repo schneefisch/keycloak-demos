@@ -30,7 +30,7 @@ case_foreign_role() {
   local token
   token=$(login bob "openid events:read" | jq -r .access_token)
   echo "  token resource_access: $(jwt_part 1 "$token" | jq -c .resource_access)"
-  echo "  events-api sees: $(whoami "$token")"
+  echo "  events-api sees: $(api_whoami "$token")"
   call_api DELETE /api/events/1 "$token"
   expect "$MODE" 204 403 "$STATUS"
 }
@@ -39,7 +39,7 @@ case_controls() {
   echo "=== Controls: alice's access token works in both modes ==="
   local token
   token=$(login alice "openid events:read" | jq -r .access_token)
-  echo "  events-api sees: $(whoami "$token")"
+  echo "  events-api sees: $(api_whoami "$token")"
   call_api GET /api/events "$token"
   expect "$MODE" 200 200 "$STATUS"
   call_api DELETE /api/events/1 "$token"

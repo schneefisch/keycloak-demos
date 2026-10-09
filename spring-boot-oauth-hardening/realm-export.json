@@ -920,7 +920,8 @@
         "realm_client": "false",
         "backchannel.logout.url": "http://localhost:8082/logout/connect/back-channel/keycloak",
         "backchannel.logout.session.required": "true",
-        "post.logout.redirect.uris": "http://localhost:8082/"
+        "post.logout.redirect.uris": "http://localhost:8082/",
+        "pkce.code.challenge.method": "S256"
       },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,

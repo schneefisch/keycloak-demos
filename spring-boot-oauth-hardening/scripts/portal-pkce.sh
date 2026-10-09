@@ -1,24 +1,9 @@
 #!/usr/bin/env bash
 # Shows the authorization request events-portal sends to Keycloak, and whether Keycloak accepts it.
-#   scripts/portal-pkce.sh            show the request parameters (state, nonce, PKCE)
-#   scripts/portal-pkce.sh enforce    Keycloak requires PKCE (S256) for events-portal
-#   scripts/portal-pkce.sh relax      Keycloak doesn't require PKCE (Keycloak's default)
+# The demo realm requires PKCE (S256) for events-portal, so a request without it is rejected.
+#   scripts/portal-pkce.sh
 source "$(dirname "$0")/lib.sh"
-
-set_pkce() {
-  kc_login
-  kcadm update "clients/$(client_uuid events-portal)" -r demo -s "attributes.\"pkce.code.challenge.method\"=$1"
-  if [ -n "$1" ]; then echo "Keycloak: events-portal must use PKCE ($1)"; else echo "Keycloak: PKCE optional for events-portal"; fi
-}
-
-case "${1:-show}" in
-  enforce) set_pkce S256; exit ;;
-  relax) set_pkce ""; exit ;;
-  show) ;;
-  *) echo "Usage: scripts/portal-pkce.sh [show|enforce|relax]"; exit 1 ;;
-esac
-
-[ -n "${IN_TOOLBOX:-}" ] || run_in_toolbox portal-pkce.sh show
+[ -n "${IN_TOOLBOX:-}" ] || run_in_toolbox portal-pkce.sh "$@"
 
 # Sends an authorization request to Keycloak and prints its answer
 keycloak_answer() {

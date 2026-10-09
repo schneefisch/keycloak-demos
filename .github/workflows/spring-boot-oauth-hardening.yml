@@ -74,7 +74,6 @@ jobs:
 
       - name: PKCE enforced by Keycloak
         run: |
-          scripts/portal-pkce.sh enforce
           scripts/portal-pkce.sh | tee pkce.log
           grep -q 'login page. Request accepted' pkce.log
           grep -q 'Missing parameter: code_challenge_method' pkce.log

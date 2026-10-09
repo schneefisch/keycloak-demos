@@ -25,7 +25,8 @@ load_modes() {
   export EVENTS_API_MODE NOTIFICATION_SERVICE_MODE EVENTS_PORTAL_MODE
 }
 
-# Runs a script inside the toolbox container (curl, jq, openssl), so the host needs Docker only
+# Runs a script inside the toolbox container (curl, jq, openssl), so the host needs Docker only.
+# Then exits: the rest of the calling script runs only inside the container.
 run_in_toolbox() {
   local script=$1
   shift
@@ -59,7 +60,7 @@ FAILED=0
 
 b64url() { openssl base64 -A | tr '+/' '-_' | tr -d '='; }
 
-# Shortens long values (tokens) for screenshots: eyJhbGciOiJS…(1234 chars)
+# Shortens long values (tokens) for readable output: eyJhbGciOiJS…(1234 chars)
 short() {
   local s=$1
   if [ "${#s}" -gt 24 ]; then echo "${s:0:12}…(${#s} chars)"; else echo "$s"; fi
@@ -134,7 +135,7 @@ call_api() {
 }
 
 # Prints what events-api made of a token (principal and authorities)
-whoami() {
+api_whoami() {
   curl -s -H "Authorization: Bearer $1" "$EVENTS_API/api/whoami" \
     | jq -c '{principal, authorities}' 2>/dev/null || echo "  (rejected)"
 }
@@ -146,9 +147,9 @@ expect() {
   if [ "$mode" = hardened ]; then expected=$hardened; else expected=$naive; fi
   [[ $actual =~ ^[0-9]+$ ]] && prefix="HTTP "
   if [ "$actual" = "$expected" ]; then
-    echo "  ✔ $prefix$actual (expected in $mode mode: naive $naive, hardened $hardened)"
+    echo "  → $prefix$actual, as expected in $mode mode (naive: $naive, hardened: $hardened)"
   else
-    echo "  ✘ $prefix$actual, expected $expected in $mode mode (naive $naive, hardened $hardened)"
+    echo "  ✘ UNEXPECTED: $prefix$actual, expected $expected in $mode mode (naive: $naive, hardened: $hardened)"
     FAILED=1
   fi
 }

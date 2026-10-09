@@ -4,7 +4,7 @@ server:
   servlet:
     session:
       cookie:
-        http-only: true
+        # HttpOnly is already the default. SameSite is not set by default (the browser decides).
         # Lax, not Strict: the browser must send the session cookie on the redirect back from
         # Keycloak, or Spring can't find the stored authorization request (state, nonce, PKCE verifier).
         same-site: lax

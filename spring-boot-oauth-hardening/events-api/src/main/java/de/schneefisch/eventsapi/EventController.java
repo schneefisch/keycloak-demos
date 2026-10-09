@@ -1,7 +1,6 @@
 package de.schneefisch.eventsapi;
 
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -28,6 +27,10 @@ public class EventController {
     }
 
     public record NewEvent(String title, String date) {
+    }
+
+    public record WhoAmI(String principal, List<String> authorities, String typ, List<String> aud, String azp,
+            String scope) {
     }
 
     private final Map<Integer, Event> events = new ConcurrentSkipListMap<>(Map.of(
@@ -58,20 +61,13 @@ public class EventController {
 
     // Shows what the API made of the token: the demo scripts print this to explain each result
     @GetMapping("/whoami")
-    public Map<String, Object> whoami(JwtAuthenticationToken authentication) {
+    public WhoAmI whoami(JwtAuthenticationToken authentication) {
         Jwt jwt = authentication.getToken();
         List<String> authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .sorted()
                 .toList();
-
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("principal", authentication.getName());
-        result.put("authorities", authorities);
-        result.put("typ", jwt.getClaimAsString("typ"));
-        result.put("aud", jwt.getAudience());
-        result.put("azp", jwt.getClaimAsString("azp"));
-        result.put("scope", jwt.getClaimAsString("scope"));
-        return result;
+        return new WhoAmI(authentication.getName(), authorities, jwt.getClaimAsString("typ"), jwt.getAudience(),
+                jwt.getClaimAsString("azp"), jwt.getClaimAsString("scope"));
     }
 }

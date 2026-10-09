@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,16 +26,16 @@ public class PortalController {
 
     private final RestClient eventsApi;
 
-    private final Environment environment;
+    private final String mode;
 
-    public PortalController(RestClient eventsApi, Environment environment) {
+    public PortalController(RestClient eventsApi, @Value("${spring.profiles.active:default}") String mode) {
         this.eventsApi = eventsApi;
-        this.environment = environment;
+        this.mode = mode;
     }
 
     @GetMapping("/")
     public String index(@AuthenticationPrincipal OidcUser user, Authentication authentication, Model model) {
-        model.addAttribute("mode", String.join(",", this.environment.getActiveProfiles()));
+        model.addAttribute("mode", this.mode);
         if (user == null) {
             return "index";
         }
@@ -58,6 +58,7 @@ public class PortalController {
         return "redirect:/";
     }
 
+    // Returns the status and, for a 401, the reason instead of throwing, so the page can show it
     private Map<String, Object> call(String path) {
         return this.eventsApi.get().uri(path).exchange((request, response) -> {
             Map<String, Object> result = new LinkedHashMap<>();

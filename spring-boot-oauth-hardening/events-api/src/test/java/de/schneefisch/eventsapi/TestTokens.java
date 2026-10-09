@@ -10,6 +10,7 @@ import java.util.Map;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -101,45 +102,25 @@ final class TestTokens {
         }
 
         /** RS256 with the key from the JWK Set, header "typ": "JWT" like Keycloak. */
-        String signed() {
-            try {
-                JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.RS256).keyID(KEY.getKeyID())
-                        .type(JOSEObjectType.JWT).build();
-                SignedJWT jwt = new SignedJWT(header, claimsSet());
-                jwt.sign(new RSASSASigner(KEY));
-                return jwt.serialize();
-            }
-            catch (Exception ex) {
-                throw new IllegalStateException(ex);
-            }
+        String signed() throws Exception {
+            return sign(JWSAlgorithm.RS256, new RSASSASigner(KEY));
         }
 
         /** The classic attack: "alg": "none" and no signature at all. */
-        String unsigned() {
-            return new PlainJWT(claimsSet()).serialize();
+        String unsigned() throws Exception {
+            return new PlainJWT(JWTClaimsSet.parse(this.claims)).serialize();
         }
 
         /** Algorithm confusion: HS256, using the public RSA key (known to everyone) as the HMAC secret. */
-        String signedWithPublicKeyAsHmacSecret() {
-            try {
-                JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256).keyID(KEY.getKeyID())
-                        .type(JOSEObjectType.JWT).build();
-                SignedJWT jwt = new SignedJWT(header, claimsSet());
-                jwt.sign(new MACSigner(KEY.toRSAPublicKey().getEncoded()));
-                return jwt.serialize();
-            }
-            catch (Exception ex) {
-                throw new IllegalStateException(ex);
-            }
+        String signedWithPublicKeyAsHmacSecret() throws Exception {
+            return sign(JWSAlgorithm.HS256, new MACSigner(KEY.toRSAPublicKey().getEncoded()));
         }
 
-        private JWTClaimsSet claimsSet() {
-            try {
-                return JWTClaimsSet.parse(this.claims);
-            }
-            catch (Exception ex) {
-                throw new IllegalStateException(ex);
-            }
+        private String sign(JWSAlgorithm algorithm, JWSSigner signer) throws Exception {
+            JWSHeader header = new JWSHeader.Builder(algorithm).keyID(KEY.getKeyID()).type(JOSEObjectType.JWT).build();
+            SignedJWT jwt = new SignedJWT(header, JWTClaimsSet.parse(this.claims));
+            jwt.sign(signer);
+            return jwt.serialize();
         }
     }
 }

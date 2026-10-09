@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Prints decoded tokens (header + payload) from the demo realm, e.g. for screenshots.
+# Prints decoded tokens (header + payload) from the demo realm.
 #   scripts/show-token.sh alice [scope]                 access token and ID token (demo-cli login)
 #   scripts/show-token.sh notification-service [scope]  client credentials token
 source "$(dirname "$0")/lib.sh"
