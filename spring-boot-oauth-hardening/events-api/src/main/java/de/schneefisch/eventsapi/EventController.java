@@ -30,7 +30,7 @@ public class EventController {
     }
 
     public record WhoAmI(String principal, List<String> authorities, String typ, List<String> aud, String azp,
-            String scope) {
+                         String scope) {
     }
 
     private final Map<Integer, Event> events = new ConcurrentSkipListMap<>(Map.of(
