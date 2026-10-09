@@ -1,0 +1,4 @@
+# Nothing beyond application.yml:
+# - no `audiences`: any token of the realm is accepted by /api/notifications
+# - no `scope` on the events-api registration: Keycloak issues only the default scopes,
+#   so the token carries no events-api audience

@@ -1,0 +1,27 @@
+server:
+  port: 8083
+
+spring:
+  security:
+    oauth2:
+      # Incoming: tokens for notification-service's own API
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/demo
+          jwk-set-uri: http://keycloak:8080/realms/demo/protocol/openid-connect/certs
+      # Outgoing: calls to events-api with the client credentials grant
+      client:
+        registration:
+          events-api:
+            provider: keycloak
+            client-id: notification-service
+            # Not in this file: set by docker-compose.yml (in production: secret store or env var)
+            client-secret: ${NOTIFICATION_SERVICE_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+        provider:
+          keycloak:
+            token-uri: http://keycloak:8080/realms/demo/protocol/openid-connect/token
+
+demo:
+  events-api:
+    url: http://events-api:8081

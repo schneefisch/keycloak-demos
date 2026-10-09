@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Events Portal</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; color: #222; }
+        h1 small { font-size: 0.5em; font-weight: normal; padding: 0.2em 0.6em; border-radius: 1em; background: #eee; }
+        table { border-collapse: collapse; margin-bottom: 1rem; }
+        td { border-bottom: 1px solid #ddd; padding: 0.3rem 0.8rem 0.3rem 0; vertical-align: top; }
+        td:first-child { font-weight: bold; }
+        pre { background: #f6f6f6; padding: 0.6rem; overflow-x: auto; }
+        form { display: inline; }
+        .result { padding: 0.5rem; background: #fff6d6; }
+    </style>
+</head>
+<body>
+<h1>Events Portal <small th:text="${mode}">naive</small></h1>
+
+<div th:if="${name == null}">
+    <p><a href="/oauth2/authorization/keycloak">Log in with Keycloak</a> (alice / password or bob / password)</p>
+</div>
+
+<div th:if="${name != null}">
+    <p>Signed in as <code th:text="${name}">alice</code>
+        (principal name, set by <code>user-name-attribute</code>)</p>
+
+    <h2>ID token claims</h2>
+    <table>
+        <tr th:each="claim : ${claims}">
+            <td th:text="${claim.key}">sub</td>
+            <td><code th:text="${claim.value}">value</code></td>
+        </tr>
+    </table>
+
+    <h2>Authorities in the portal</h2>
+    <p><code th:each="authority : ${authorities}" th:text="${authority} + ' '">OIDC_USER</code></p>
+
+    <h2>Events from events-api</h2>
+    <p>Called with your access token, which never leaves the server.</p>
+    <pre th:text="${events}">{status=200, body=[...]}</pre>
+
+    <p th:if="${deleteResult}" class="result" th:text="${deleteResult}">DELETE result</p>
+    <form method="post" th:action="@{/events/1/delete}">
+        <button type="submit">Delete event 1 (needs events-api role admin)</button>
+    </form>
+    <form method="post" th:action="@{/logout}">
+        <button type="submit">Log out</button>
+    </form>
+</div>
+</body>
+</html>
