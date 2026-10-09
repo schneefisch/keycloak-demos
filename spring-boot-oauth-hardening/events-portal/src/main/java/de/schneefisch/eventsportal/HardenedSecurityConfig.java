@@ -22,8 +22,10 @@ public class HardenedSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/error").permitAll()
                         .anyRequest().authenticated())
-                // state, nonce and PKCE are on by default (PKCE for confidential clients since Spring Security 7.0)
-                .oauth2Login(Customizer.withDefaults())
+                // state, nonce and PKCE are on by default (PKCE for confidential clients since Spring Security 7.0).
+                // The iss check (RFC 9207) is not: only needed with several IdPs, see the repository class.
+                .oauth2Login(login -> login.authorizationEndpoint(endpoint -> endpoint
+                        .authorizationRequestRepository(new IssuerCheckingAuthorizationRequestRepository(registrations))))
                 // Ends the Keycloak SSO session too, not only the local one (RP-initiated logout)
                 .logout(logout -> logout.logoutSuccessHandler(rpInitiatedLogout(registrations)))
                 // Keycloak notifies the app when the SSO session ends elsewhere (back-channel logout)

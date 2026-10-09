@@ -98,6 +98,7 @@ client secret from an environment variable. Its own API gets only the `audiences
 | Setting                   | naive                                          | hardened                                                  |
 |---------------------------|------------------------------------------------|-----------------------------------------------------------|
 | `state`, `nonce`, PKCE    | ✔ (Spring Security 7 default, PKCE for confidential clients too) | ✔                                       |
+| `iss` in the callback (RFC 9207) | ✘ not checked                           | [IssuerCheckingAuthorizationRequestRepository](events-portal/src/main/java/de/schneefisch/eventsportal/IssuerCheckingAuthorizationRequestRepository.java), needed only with several IdPs |
 | PKCE required by Keycloak | ✔ realm setting                                | ✔                                                         |
 | CSRF protection           | ✘ disabled (copied from an API config)         | ✔ on (default)                                            |
 | Logout                    | local session only                             | RP-initiated logout + back-channel logout                 |
