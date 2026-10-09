@@ -1,0 +1,8 @@
+spring:
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            # Common in tutorials. preferred_username can change and be reused by another user.
+            user-name-attribute: preferred_username

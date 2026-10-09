@@ -1,0 +1,25 @@
+server:
+  port: 8082
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: events-portal
+            # Not in this file: set by docker-compose.yml (in production: secret store or env var)
+            client-secret: ${EVENTS_PORTAL_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            # Always explicit: without `openid`, Spring falls back to plain OAuth 2.0 login
+            # (no nonce, no ID token). Spring Boot sets no default scope for custom providers.
+            scope: openid,profile,email,events:read,events:write
+        provider:
+          keycloak:
+            # Discovery at startup, `iss` check on every ID token. The portal shares Keycloak's
+            # network namespace (docker-compose.yml), so localhost:8080 works for app and browser.
+            issuer-uri: http://localhost:8080/realms/demo
+
+demo:
+  events-api:
+    url: http://events-api:8081

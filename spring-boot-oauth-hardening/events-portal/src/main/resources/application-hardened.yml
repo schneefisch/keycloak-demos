@@ -1,0 +1,11 @@
+# `user-name-attribute` stays at its default `sub`: stable and unique per issuer.
+
+server:
+  servlet:
+    session:
+      cookie:
+        # HttpOnly is already the default. SameSite is not set by default (the browser decides).
+        # Lax, not Strict: the browser must send the session cookie on the redirect back from
+        # Keycloak, or Spring can't find the stored authorization request (state, nonce, PKCE verifier).
+        same-site: lax
+        # In production (HTTPS): secure: true

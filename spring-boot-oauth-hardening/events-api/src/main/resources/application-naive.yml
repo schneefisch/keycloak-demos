@@ -1,0 +1,2 @@
+# Nothing beyond application.yml: issuer-uri and the defaults most teams ship.
+# Roles: see NaiveJwtConfig.

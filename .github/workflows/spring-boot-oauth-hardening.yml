@@ -1,0 +1,87 @@
+name: spring-boot-oauth-hardening
+
+on:
+  push:
+    paths:
+      - 'spring-boot-oauth-hardening/**'
+      - '.github/workflows/spring-boot-oauth-hardening.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'spring-boot-oauth-hardening/**'
+      - '.github/workflows/spring-boot-oauth-hardening.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: spring-boot-oauth-hardening
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Validate realm-export.json
+        run: python3 -c "import json; json.load(open('realm-export.json'))"
+
+      - name: Validate docker-compose.yml
+        run: docker compose config --quiet
+
+      - name: Check script syntax
+        run: for f in scripts/*.sh; do bash -n "$f"; done
+
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: spring-boot-oauth-hardening/events-api
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Run events-api tests
+        run: docker run --rm -v "$PWD":/src -w /src gradle:9.8.0-jdk25 gradle test --no-daemon
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: validate
+    defaults:
+      run:
+        working-directory: spring-boot-oauth-hardening
+    steps:
+      - uses: actions/checkout@v6.0.2
+
+      - name: Start stack (naive mode)
+        run: docker compose up -d --build --wait
+
+      - name: Naive mode
+        run: |
+          scripts/attack.sh
+          scripts/client-credentials.sh
+          scripts/portal-login.sh bob
+          scripts/portal-logout.sh
+
+      - name: Hardened events-api, naive notification-service
+        run: |
+          scripts/mode.sh hardened events-api
+          scripts/attack.sh
+          scripts/client-credentials.sh
+
+      - name: Hardened mode
+        run: |
+          scripts/mode.sh hardened
+          scripts/client-credentials.sh
+          scripts/portal-login.sh bob
+          scripts/portal-logout.sh
+
+      - name: PKCE enforced by Keycloak
+        run: |
+          scripts/portal-pkce.sh | tee pkce.log
+          grep -q 'login page. Request accepted' pkce.log
+          grep -q 'Missing parameter: code_challenge_method' pkce.log
+
+      - name: Logs
+        if: failure()
+        run: docker compose logs
+
+      - name: Cleanup
+        if: always()
+        run: docker compose --profile tools down --rmi local

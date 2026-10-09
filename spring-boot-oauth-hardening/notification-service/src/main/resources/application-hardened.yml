@@ -1,0 +1,12 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          audiences: notification-service
+      client:
+        registration:
+          events-api:
+            # Ask for exactly what this service needs. In Keycloak the scope's audience mapper
+            # also adds `aud: events-api`, which the hardened events-api requires.
+            scope: events:read

@@ -1,0 +1,13 @@
+server:
+  port: 8081
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # Validates `iss`. Must match the `iss` claim exactly: tokens are issued via localhost:8080.
+          issuer-uri: http://localhost:8080/realms/demo
+          # Keys are fetched over the Docker network. With both values set, Spring checks `iss`
+          # but does not call the issuer's discovery endpoint.
+          jwk-set-uri: http://keycloak:8080/realms/demo/protocol/openid-connect/certs
